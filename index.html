@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ふるさと納税コンシェルジュ</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  color: #333;
+}
+
+header {
+  background: linear-gradient(120deg, #168b78, #42b49a);
+  color: white;
+  padding: 35px 20px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+header p {
+  margin-bottom: 0;
+}
+
+.container {
+  max-width: 850px;
+  margin: 30px auto;
+  padding: 0 15px;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+}
+
+h2 {
+  font-size: 21px;
+  margin-top: 0;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 14px;
+  font-size: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.categories label {
+  background: #f0f5f4;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button {
+  background: #168b78;
+  color: white;
+  border: none;
+  padding: 14px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background: #10705f;
+}
+
+.main-button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.budget {
+  background: #e6f7f2;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.budget strong {
+  display: block;
+  font-size: 30px;
+  color: #168b78;
+  margin: 10px 0;
+}
+
+.product {
+  border: 1px solid #eee;
+  padding: 18px;
+  margin-top: 12px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.product h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.product p {
+  margin: 0;
+  color: #666;
+}
+
+.delete {
+  background: #e86c6c;
+  padding: 9px 14px;
+}
+
+.delete:hover {
+  background: #c94d4d;
+}
+
+.notice {
+  font-size: 13px;
+  color: #777;
+  line-height: 1.7;
+}
+
+footer {
+  text-align: center;
+  padding: 30px;
+  color: #888;
+}
+
+@media(max-width:600px) {
+  header h1 {
+    font-size: 23px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .product {
+    align-items: flex-start;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎁 ふるさと納税コンシェルジュ</h1>
+  <p>あなたにぴったりの返礼品を見つけよう！</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>① 寄附予算を入力</h2>
+
+    <p>今年の寄附上限額の目安を入力してください。</p>
+
+    <input
+      type="number"
+      id="budget"
+      value="60000"
+      min="0"
+      step="1000"
+    >
+
+    <p class="notice">
+      ※この試作品では控除上限額の自動計算は行いません。
+      ご自身で確認した金額を入力してください。
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>② 欲しい返礼品を選択</h2>
+
+    <div class="categories">
+      <label>
+        <input type="checkbox" value="米" checked>
+        🍚 お米
+      </label>
+
+      <label>
+        <input type="checkbox" value="肉" checked>
+        🥩 お肉
+      </label>
+
+      <label>
+        <input type="checkbox" value="海鮮" checked>
+        🐟 海鮮
+      </label>
+
+      <label>
+        <input type="checkbox" value="日用品" checked>
+        🧻 日用品
+      </label>
+
+      <label>
+        <input type="checkbox" value="果物" checked>
+        🍎 果物
+      </label>
+    </div>
+
+    <button class="main-button" onclick="recommend()">
+      ✨ おすすめの返礼品を提案する
+    </button>
+  </div>
+
+  <div class="card">
+    <h2>③ あなたへのおすすめ</h2>
+
+    <div class="budget">
+      残りの寄附予算
+      <strong id="remaining">60,000円</strong>
+      <span id="used">選択済み：0円</span>
+    </div>
+
+    <div id="results">
+      <p>予算とジャンルを選んで提案ボタンを押してください。</p>
+    </div>
+
+    <button class="main-button" onclick="recommend()">
+      🔄 別の組み合わせを提案
+    </button>
+  </div>
+
+  <div class="card">
+    <h2>💡 このサービスについて</h2>
+
+    <p>
+      ふるさと納税コンシェルジュは、
+      寄附予算や好みに合わせて返礼品の組み合わせを提案するサービスです。
+    </p>
+
+    <p class="notice">
+      ※現在は開発中の試作品です。表示される商品・寄附額は
+      動作確認用の架空データであり、実際の返礼品ではありません。
+      寄附可能額や税額控除を保証するものではありません。
+    </p>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 ふるさと納税コンシェルジュ
+</footer>
+
+<script>
+
+// 動作確認用の架空の商品データ
+const products = [
+  {name:"お米 5kg", category:"米", price:12000},
+  {name:"お米 10kg", category:"米", price:22000},
+  {name:"国産牛切り落とし 1kg", category:"肉", price:15000},
+  {name:"国産豚肉セット 2kg", category:"肉", price:12000},
+  {name:"北海道産ホタテ 1kg", category:"海鮮", price:18000},
+  {name:"鮭切り身セット", category:"海鮮", price:14000},
+  {name:"トイレットペーパー 72ロール", category:"日用品", price:13000},
+  {name:"ティッシュペーパー 60箱", category:"日用品", price:16000},
+  {name:"シャインマスカット", category:"果物", price:15000},
+  {name:"旬のフルーツ詰め合わせ", category:"果物", price:12000}
+];
+
+let selectedProducts = [];
+
+function getBudget() {
+  const value = Number(document.getElementById("budget").value);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function formatYen(value) {
+  return value.toLocaleString("ja-JP") + "円";
+}
+
+function getTotal() {
+  return selectedProducts.reduce((sum, p) => sum + p.price, 0);
+}
+
+function updateBudget() {
+  const budget = getBudget();
+  const total = getTotal();
+  const remaining = budget - total;
+
+  document.getElementById("remaining").textContent =
+    formatYen(remaining);
+
+  document.getElementById("used").textContent =
+    "選択済み：" + formatYen(total);
+}
+
+function recommend() {
+
+  const budget = getBudget();
+
+  if (budget <= 0) {
+    alert("寄附予算を入力してください。");
+    return;
+  }
+
+  const categories = Array.from(
+    document.querySelectorAll(
+      '.categories input:checked'
+    )
+  ).map(input => input.value);
+
+  if (categories.length === 0) {
+    alert("返礼品のジャンルを選択してください。");
+    return;
+  }
+
+  const candidates = products
+    .filter(p => categories.includes(p.category))
+    .sort(() => Math.random() - 0.5);
+
+  selectedProducts = [];
+
+  let remaining = budget;
+
+  for (const product of candidates) {
+    if (product.price <= remaining) {
+      selectedProducts.push(product);
+      remaining -= product.price;
+    }
+  }
+
+  renderProducts();
+}
+
+function removeProduct(index) {
+  selectedProducts.splice(index, 1);
+  renderProducts();
+}
+
+function renderProducts() {
+
+  const results = document.getElementById("results");
+
+  results.innerHTML = "";
+
+  if (selectedProducts.length === 0) {
+    const message = document.createElement("p");
+    message.textContent =
+      "条件に合う返礼品がありません。予算やジャンルを変更してください。";
+    results.appendChild(message);
+  }
+
+  selectedProducts.forEach((product, index) => {
+
+    const item = document.createElement("div");
+    item.className = "product";
+
+    const info = document.createElement("div");
+
+    const title = document.createElement("h3");
+    title.textContent = product.name;
+
+    const price = document.createElement("p");
+    price.textContent = formatYen(product.price);
+
+    info.appendChild(title);
+    info.appendChild(price);
+
+    const button = document.createElement("button");
+    button.className = "delete";
+    button.textContent = "削除";
+
+    button.addEventListener("click", () => {
+      removeProduct(index);
+    });
+
+    item.appendChild(info);
+    item.appendChild(button);
+
+    results.appendChild(item);
+  });
+
+  updateBudget();
+}
+
+document.getElementById("budget")
+  .addEventListener("input", updateBudget);
+
+updateBudget();
+
+</script>
+
+</body>
+</html>
